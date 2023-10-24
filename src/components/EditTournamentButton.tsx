@@ -1,7 +1,5 @@
 "use client"
 import { useRouter } from "next/navigation"
-import { Toast } from "./Toast"
-import { useState } from "react"
 
 export default function EditTournamentButton({
 	params,

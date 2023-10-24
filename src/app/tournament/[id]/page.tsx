@@ -30,7 +30,7 @@ export default async function TournamentPage({
 							<h2 className="text-xl font-bold mb-2">
 								{tournament.name}
 							</h2>
-							{admin && <ShareButton url={params.id} />}
+							<ShareButton url={params.id} />
 						</div>
 						<p className="mb-2">
 							<span className="font-semibold">

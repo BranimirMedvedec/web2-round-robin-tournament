@@ -10,7 +10,7 @@ export default async function setDocument(
 		await setDoc(doc(firestoreDB, colName, docId), data)
 		return true
 	} catch (error) {
-		console.error("Error adding document: ", error)
+		// console.error("Error adding document: ", error)
 		return false
 	}
 }

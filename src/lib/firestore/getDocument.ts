@@ -9,9 +9,9 @@ export default async function getDocument(colName: string, docId: string) {
 		if (docSnap.exists()) {
 			return docSnap.data()
 		} else {
-			console.log("No such document!")
+			// console.log("No such document!")
 		}
 	} catch (error) {
-		console.error("Error getting document:", error)
+		// console.error("Error getting document:", error)
 	}
 }
