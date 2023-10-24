@@ -2,12 +2,16 @@
 import { Toast } from "./Toast"
 import { useState } from "react"
 
-export default function ShareButton({ url }: { url: string }) {
+export default function ShareTournamentButton({
+	params,
+}: {
+	params: { url: string }
+}) {
 	const [showToast, setShowToast] = useState(false)
 
 	const handleClick = () => {
 		const baseUrl = process.env.NEXT_PUBLIC_URL
-		const fullUrl = baseUrl! + "/tournament/preview/" + url
+		const fullUrl = baseUrl! + "/tournament/preview/" + params.url
 
 		navigator.clipboard.writeText(fullUrl)
 		setShowToast(true)

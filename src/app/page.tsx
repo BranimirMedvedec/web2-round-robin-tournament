@@ -1,12 +1,16 @@
-import { Session, getSession } from "@auth0/nextjs-auth0"
+"use client"
 import Link from "next/link"
 import CreateTournamentModal from "@/components/CreateTournamentModal"
+import { useUser } from "@auth0/nextjs-auth0/client"
+import Loading from "@/components/Loading"
 
-export default async function Home() {
-	const session: Session | null | undefined = await getSession()
-	const user = session?.user || {}
+export default function Home() {
+	const { user, error, isLoading } = useUser()
 
-	return Object.keys(user).length !== 0 ? (
+	if (isLoading) return <Loading />
+	if (error) return <div>Error! Please try again.</div>
+
+	return user ? (
 		<div className="flex flex-col items-center justify-center min-h-screen">
 			<div className="container mx-auto py-8">
 				<div className="mb-8 text-center">

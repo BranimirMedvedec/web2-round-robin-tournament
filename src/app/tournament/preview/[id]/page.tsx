@@ -1,5 +1,6 @@
 "use client"
-import ShareButton from "@/components/ShareButton"
+import ShareTournamentButton from "@/components/ShareTournamentButton"
+import EditTournamentButton from "@/components/EditTournamentButton"
 import MatchesSchedule from "@/components/tournamentData/MatchesSchedule"
 import StandingsTable from "@/components/tournamentData/StandingsTable"
 import getDocument from "@/lib/firestore/getDocument"
@@ -41,7 +42,14 @@ export default function TournamentPreviewPage() {
 								<h2 className="text-xl font-bold mb-2">
 									{tournament.name}
 								</h2>
-								<ShareButton url={id} />
+								<div>
+									<ShareTournamentButton
+										params={{ url: id }}
+									/>
+									<EditTournamentButton
+										params={{ id: 1, url: id }}
+									/>
+								</div>
 							</div>
 							<p className="mb-2">
 								<span className="font-semibold">

@@ -3,7 +3,8 @@ import { Tournament } from "@/types/tournamentInfo/tournament"
 import MatchesSchedule from "@/components/tournamentData/MatchesSchedule"
 import StandingsTable from "@/components/tournamentData/StandingsTable"
 import { Session, getSession } from "@auth0/nextjs-auth0"
-import ShareButton from "@/components/ShareButton"
+import DeleteTournamentButton from "@/components/DeleteTournamentButton"
+import ShareTournamentButton from "@/components/ShareTournamentButton"
 
 export default async function TournamentPage({
 	params,
@@ -30,7 +31,17 @@ export default async function TournamentPage({
 							<h2 className="text-xl font-bold mb-2">
 								{tournament.name}
 							</h2>
-							<ShareButton url={params.id} />
+							<div>
+								<ShareTournamentButton
+									params={{ url: params.id }}
+								/>
+								<DeleteTournamentButton
+									params={{
+										id: 1,
+										url: params.id,
+									}}
+								/>
+							</div>
 						</div>
 						<p className="mb-2">
 							<span className="font-semibold">

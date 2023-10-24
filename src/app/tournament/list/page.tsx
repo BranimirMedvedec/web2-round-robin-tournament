@@ -1,7 +1,7 @@
 "use client"
 import DeleteTournamentButton from "@/components/DeleteTournamentButton"
 import EditTournamentButton from "@/components/EditTournamentButton"
-import ShareButton from "@/components/ShareButton"
+import ShareTournamentButton from "@/components/ShareTournamentButton"
 import { firestoreDB } from "@/lib/firebase"
 import { Tournament } from "@/types/tournamentInfo/tournament"
 import { useUser } from "@auth0/nextjs-auth0/client"
@@ -127,8 +127,10 @@ export default function TournamentListPage() {
 															url: tournament.id,
 														}}
 													/>
-													<ShareButton
-														url={tournament.id}
+													<ShareTournamentButton
+														params={{
+															url: tournament.id,
+														}}
 													/>
 													<DeleteTournamentButton
 														params={{
