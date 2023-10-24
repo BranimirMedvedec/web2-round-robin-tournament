@@ -13,7 +13,7 @@ export default function MatchesSchedule({
 }: {
 	tournamentId: string
 	scoring: Scoring
-	admin: boolean
+	admin?: boolean
 }) {
 	const [schedule, setSchedule] = useState<Schedule | null>(null)
 

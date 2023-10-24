@@ -7,7 +7,7 @@ export default function ShareButton({ url }: { url: string }) {
 
 	const handleClick = () => {
 		const baseUrl = process.env.NEXT_PUBLIC_URL
-		const fullUrl = baseUrl! + /tournament/ + url
+		const fullUrl = baseUrl! + "/tournament/preview/" + url
 
 		navigator.clipboard.writeText(fullUrl)
 		setShowToast(true)

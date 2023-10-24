@@ -21,6 +21,7 @@ export default async function AvatarDropdownMenu() {
 										alt="avatar"
 										width="24"
 										height="24"
+										priority={true}
 									/>
 								</label>
 								<div className="dropdown-menu dropdown-menu-bottom-left">
