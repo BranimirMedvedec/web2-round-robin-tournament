@@ -5,31 +5,28 @@ import MatchesSchedule from "@/components/tournamentData/MatchesSchedule"
 import StandingsTable from "@/components/tournamentData/StandingsTable"
 import getDocument from "@/lib/firestore/getDocument"
 import { Tournament } from "@/types/tournamentInfo/tournament"
-import { useUser } from "@auth0/nextjs-auth0/client"
-import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { notFound } from "next/navigation"
 
-export default function TournamentPreviewPage() {
-	const { user } = useUser()
-	const pathname = usePathname()
+export default function TournamentPreviewPage({
+	params,
+}: {
+	params: { id: string }
+}) {
+	const id = decodeURIComponent(params.id)
 	const [tournament, setTournament] = useState<Tournament | undefined>(
 		undefined
 	)
-	const id = pathname.split("/")[3]
+
+	if (!tournament) {
+		notFound()
+	}
 
 	useEffect(() => {
-		fetchTournament(id)
-	}, [id, pathname])
-
-	async function fetchTournament(id: string) {
-		try {
-			await getDocument("tournamentInfo", id).then((tournamentData) => {
-				setTournament(tournamentData as Tournament)
-			})
-		} catch (error) {
-			// console.error("Error fetching tournament:", error)
-		}
-	}
+		getDocument("tournamentInfo", id).then((tournament) => {
+			setTournament(tournament as Tournament)
+		})
+	}, [id])
 
 	return (
 		tournament && (

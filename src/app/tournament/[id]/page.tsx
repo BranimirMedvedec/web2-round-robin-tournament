@@ -5,19 +5,25 @@ import StandingsTable from "@/components/tournamentData/StandingsTable"
 import { Session, getSession } from "@auth0/nextjs-auth0"
 import DeleteTournamentButton from "@/components/DeleteTournamentButton"
 import ShareTournamentButton from "@/components/ShareTournamentButton"
+import { notFound } from "next/navigation"
 
 export default async function TournamentPage({
 	params,
 }: {
 	params: { id: string }
 }) {
+	const id = decodeURIComponent(params.id)
 	const session: Session | null | undefined = await getSession()
 	const user = session?.user || {}
 
 	const tournament: Tournament | undefined = (await getDocument(
 		"tournamentInfo",
-		params.id
+		id
 	)) as Tournament
+
+	if (!tournament) {
+		notFound()
+	}
 
 	const admin = user.sub === tournament.user_id
 
@@ -32,13 +38,11 @@ export default async function TournamentPage({
 								{tournament.name}
 							</h2>
 							<div>
-								<ShareTournamentButton
-									params={{ url: params.id }}
-								/>
+								<ShareTournamentButton params={{ url: id }} />
 								<DeleteTournamentButton
 									params={{
 										id: 1,
-										url: params.id,
+										url: id,
 									}}
 								/>
 							</div>
@@ -64,7 +68,7 @@ export default async function TournamentPage({
 			<div className="p-6">
 				<h1 className="text-3xl font-bold mb-4">Schedule</h1>
 				<MatchesSchedule
-					tournamentId={params.id}
+					tournamentId={id}
 					scoring={tournament.scoring}
 					admin={admin}
 				/>
@@ -73,7 +77,7 @@ export default async function TournamentPage({
 			<div className="p-6">
 				<h2 className="text-3xl font-bold mb-4">Standings</h2>
 				<StandingsTable
-					tournamentId={params.id}
+					tournamentId={id}
 					scoring={tournament.scoring}
 				/>
 			</div>
