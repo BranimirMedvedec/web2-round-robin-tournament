@@ -6,27 +6,36 @@ import StandingsTable from "@/components/tournamentData/StandingsTable"
 import getDocument from "@/lib/firestore/getDocument"
 import { Tournament } from "@/types/tournamentInfo/tournament"
 import { useEffect, useState } from "react"
-import { notFound } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { useUser } from "@auth0/nextjs-auth0/client"
 
 export default function TournamentPreviewPage({
 	params,
 }: {
 	params: { id: string }
 }) {
+	const { user } = useUser()
 	const id = decodeURIComponent(params.id)
 	const [tournament, setTournament] = useState<Tournament | undefined>(
 		undefined
 	)
+	const router = useRouter()
 
-	if (!tournament) {
-		notFound()
-	}
+	const admin = user?.sub === tournament?.user_id
 
 	useEffect(() => {
-		getDocument("tournamentInfo", id).then((tournament) => {
-			setTournament(tournament as Tournament)
-		})
-	}, [id])
+		getDocument("tournamentInfo", id)
+			.then((tournament) => {
+				if (!tournament) {
+					router.push("/404")
+				}
+				setTournament(tournament as Tournament)
+			})
+			.catch((err) => {
+				// console.log(err)
+				router.push("/404")
+			})
+	}, [id, router])
 
 	return (
 		tournament && (
@@ -39,14 +48,16 @@ export default function TournamentPreviewPage({
 								<h2 className="text-xl font-bold mb-2">
 									{tournament.name}
 								</h2>
-								<div>
-									<ShareTournamentButton
-										params={{ url: id }}
-									/>
-									<EditTournamentButton
-										params={{ id: 1, url: id }}
-									/>
-								</div>
+								{admin && (
+									<div>
+										<ShareTournamentButton
+											params={{ url: id }}
+										/>
+										<EditTournamentButton
+											params={{ id: 1, url: id }}
+										/>
+									</div>
+								)}
 							</div>
 							<p className="mb-2">
 								<span className="font-semibold">

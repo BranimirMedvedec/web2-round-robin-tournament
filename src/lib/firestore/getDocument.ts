@@ -10,8 +10,10 @@ export default async function getDocument(colName: string, docId: string) {
 			return docSnap.data()
 		} else {
 			// console.log("No such document!")
+            return null
 		}
 	} catch (error) {
 		// console.error("Error getting document:", error)
+        return null
 	}
 }

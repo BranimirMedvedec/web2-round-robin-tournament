@@ -10,7 +10,7 @@ import RoundRobinTimetable from "@/lib/utils/roundRobinTimetable"
 import { Schedule } from "@/types/tournamentData/schedule"
 import CheckTournamentUrlExists from "@/lib/firestore/checkTournamentExists"
 import generateRandomString from "@/lib/utils/generateRandomString"
-import { Toast } from "./Toast"
+import Spinner from "./Spinner"
 
 export default function TournamentModal() {
 	const router = useRouter()
@@ -24,11 +24,9 @@ export default function TournamentModal() {
 	const [invalidContestants, setInvalidContestants] = useState(false)
 	const [submitting, setSubmitting] = useState(false)
 
-	const [showToast, setShowToast] = useState(false)
-
 	const generateTournamentURL = () => {
 		return `${tournamentName
-			.trimEnd()
+			.trim()
 			.replace(/\s+/g, "-")}-${generateRandomString(5)}`
 	}
 
@@ -66,17 +64,15 @@ export default function TournamentModal() {
 		event.preventDefault()
 		setSubmitting(true)
 
-		setShowToast(true)
-
 		if (!user) return
 
-		let tournamentURL = generateTournamentURL()
-		let tournamentExists = await CheckTournamentUrlExists(tournamentURL)
+		let tournamentURL
+		let tournamentExists
 
-		while (tournamentExists) {
+		do {
 			tournamentURL = generateTournamentURL()
 			tournamentExists = await CheckTournamentUrlExists(tournamentURL)
-		}
+		} while (tournamentExists)
 
 		const scoring: Scoring = {
 			win: win!,
@@ -123,13 +119,10 @@ export default function TournamentModal() {
 			schedule
 		)
 
-        setShowToast(false)
-        
-
-
 		if (resultInfo && resultSchedule && resultStandings) {
 			router.push(`/tournament/${tournamentURL}`)
 		} else {
+			setSubmitting(false)
 			alert("Error createing the tournament. Please try again.")
 		}
 	}
@@ -140,174 +133,163 @@ export default function TournamentModal() {
 		setWin(null)
 		setDraw(null)
 		setLoss(null)
-        setInvalidContestants(false)
-        setDisabled(true)
-        setSubmitting(false)
+		setInvalidContestants(false)
+		setDisabled(true)
+		setSubmitting(false)
 	}
 
 	return (
-		<>
-			<article>
-				<label
-					className="btn btn-primary"
-					htmlFor="modal-3">
-					Create New Tournament
-				</label>
-				<input
-					className="modal-state"
-					id="modal-3"
-					type="checkbox"
-					onClick={handleModalClose}
-				/>
-				<div className="modal">
-					<label className="modal-overlay"></label>
-					<div className="modal-content flex w-full flex-col gap-5 p-7">
-						<label
-							htmlFor="modal-3"
-							className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-							✕
-						</label>
-						<div className="flex flex-col gap-2">
-							<h2 className="text-center text-xl font-semibold">
-								Enter Tournament Details
-							</h2>
-						</div>
-						<form onSubmit={handleCreateTournament}>
-							<section>
-								<div className="form-group">
-									<div className="form-field">
-										<label className="form-label">
-											Tournament Name
-										</label>
-										<input
+		<article>
+			<label
+				className="btn btn-primary"
+				htmlFor="modal-3">
+				Create New Tournament
+			</label>
+			<input
+				className="modal-state"
+				id="modal-3"
+				type="checkbox"
+				onClick={handleModalClose}
+			/>
+			<div className="modal">
+				<label className="modal-overlay"></label>
+				<div className="modal-content flex w-full flex-col gap-5 p-7">
+					<label
+						htmlFor="modal-3"
+						className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+						✕
+					</label>
+					<div className="flex flex-col gap-2">
+						<h2 className="text-center text-xl font-semibold">
+							Enter Tournament Details
+						</h2>
+					</div>
+					<form onSubmit={handleCreateTournament}>
+						<section>
+							<div className="form-group">
+								<div className="form-field">
+									<label className="form-label">
+										Tournament Name
+									</label>
+									<input
+										required
+										autoFocus
+										placeholder="Chess Tournament..."
+										type="text"
+										className="input max-w-full"
+										value={tournamentName}
+										onChange={(e) =>
+											setTournamentName(e.target.value)
+										}
+									/>
+								</div>
+								<div className="form-field">
+									<label
+										className={`form-label ${
+											invalidContestants
+												? "text-error"
+												: ""
+										}`}>
+										Contestants
+									</label>
+									<div className="form-control">
+										<textarea
 											required
-											autoFocus
-											placeholder="Chess Tournament..."
-											type="text"
-											className="input max-w-full"
-											value={tournamentName}
-											onChange={(e) =>
-												setTournamentName(
-													e.target.value
+											className={`textarea max-w-full ${
+												invalidContestants
+													? "textarea-error"
+													: ""
+											}`}
+											rows={4}
+											placeholder="One contestant per line"
+											value={contestants.join("\n")}
+											onChange={(e) => {
+												const contestantsArray =
+													e.target.value.split("\n")
+												setContestants(contestantsArray)
+												handleInvalidContestantsCheck(
+													contestantsArray
 												)
-											}
+											}}
 										/>
 									</div>
-									<div className="form-field">
-										<label
-											className={`form-label ${
+									<label className="form-label">
+										<span
+											className={`form-label-alt ${
 												invalidContestants
 													? "text-error"
 													: ""
 											}`}>
-											Contestants
-										</label>
-										<div className="form-control">
-											<textarea
-												required
-												className={`textarea max-w-full ${
-													invalidContestants
-														? "textarea-error"
-														: ""
-												}`}
-												rows={4}
-												placeholder="One contestant per line"
-												value={contestants.join("\n")}
-												onChange={(e) => {
-													const contestantsArray =
-														e.target.value.split(
-															"\n"
-														)
-													setContestants(
-														contestantsArray
-													)
-													handleInvalidContestantsCheck(
-														contestantsArray
-													)
-												}}
-											/>
-										</div>
-										<label className="form-label">
-											<span
-												className={`form-label-alt ${
-													invalidContestants
-														? "text-error"
-														: ""
-												}`}>
-												Enter 4 to 8 unique contestants
-												with no empty lines.
-											</span>
-										</label>
+											Enter 4 to 8 unique contestants with
+											no empty lines.
+										</span>
+									</label>
+								</div>
+								<div className="form-field">
+									<label className="form-label">
+										<span>Scoring (win/draw/loss)</span>
+									</label>
+									<div className="form-control justify-between">
+										<input
+											required
+											type="number"
+											step={0.5}
+											className="input w-1/3"
+											placeholder="Win"
+											value={win === 0 ? 0 : win || ""}
+											onChange={(e) =>
+												setWin(
+													e.target.value === "0"
+														? 0
+														: parseFloat(
+																e.target.value
+														  )
+												)
+											}
+										/>
+										<input
+											required
+											type="number"
+											step={0.5}
+											className="input w-1/3"
+											placeholder="Draw"
+											value={draw === 0 ? 0 : draw || ""}
+											onChange={(e) =>
+												setDraw(
+													e.target.value === "0"
+														? 0
+														: parseFloat(
+																e.target.value
+														  )
+												)
+											}
+										/>
+										<input
+											required
+											type="number"
+											step={0.5}
+											className="input w-1/3"
+											placeholder="Loss"
+											value={loss === 0 ? 0 : loss || ""}
+											onChange={(e) =>
+												setLoss(
+													e.target.value === "0"
+														? 0
+														: parseFloat(
+																e.target.value
+														  )
+												)
+											}
+										/>
 									</div>
-									<div className="form-field">
-										<label className="form-label">
-											<span>Scoring (win/draw/loss)</span>
-										</label>
-										<div className="form-control justify-between">
-											<input
-												required
-												type="number"
-												step={0.5}
-												className="input w-1/3"
-												placeholder="Win"
-												value={
-													win === 0 ? 0 : win || ""
-												}
-												onChange={(e) =>
-													setWin(
-														e.target.value === "0"
-															? 0
-															: parseFloat(
-																	e.target
-																		.value
-															  )
-													)
-												}
-											/>
-											<input
-												required
-												type="number"
-												step={0.5}
-												className="input w-1/3"
-												placeholder="Draw"
-												value={
-													draw === 0 ? 0 : draw || ""
-												}
-												onChange={(e) =>
-													setDraw(
-														e.target.value === "0"
-															? 0
-															: parseFloat(
-																	e.target
-																		.value
-															  )
-													)
-												}
-											/>
-											<input
-												required
-												type="number"
-												step={0.5}
-												className="input w-1/3"
-												placeholder="Loss"
-												value={
-													loss === 0 ? 0 : loss || ""
-												}
-												onChange={(e) =>
-													setLoss(
-														e.target.value === "0"
-															? 0
-															: parseFloat(
-																	e.target
-																		.value
-															  )
-													)
-												}
-											/>
-										</div>
-									</div>
-									<div className="form-field pt-5">
-										<div className="form-control justify-between">
+								</div>
+								<div className="form-field pt-5">
+									<div className="form-control justify-between">
+										{submitting ? (
+											<div className="mx-auto">
+												<Spinner />
+											</div>
+										) : (
 											<button
 												type="submit"
 												className="btn btn-primary w-full"
@@ -316,20 +298,14 @@ export default function TournamentModal() {
 												}>
 												Create Tournament
 											</button>
-										</div>
+										)}
 									</div>
 								</div>
-							</section>
-						</form>
-					</div>
+							</div>
+						</section>
+					</form>
 				</div>
-			</article>
-			{showToast && (
-				<Toast
-					type="warning"
-					message="Creating your tournament..."
-				/>
-			)}
-		</>
+			</div>
+		</article>
 	)
 }

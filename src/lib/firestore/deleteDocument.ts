@@ -6,5 +6,6 @@ export default async function deleteDocument(colName: string, docId: string) {
 		await deleteDoc(doc(firestoreDB, colName, docId))
 	} catch (error) {
 		// console.error("Error removing document: ", error)
+        return null
 	}
 }

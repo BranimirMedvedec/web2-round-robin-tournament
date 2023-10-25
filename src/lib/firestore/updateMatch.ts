@@ -25,6 +25,7 @@ export default async function updateMatch(
 
 		await setDoc(matchesRef, schedule)
 	} catch (error) {
-		console.log(error)
+		// console.log(error)
+		return null
 	}
 }

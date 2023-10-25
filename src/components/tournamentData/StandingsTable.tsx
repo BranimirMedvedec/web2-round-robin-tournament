@@ -5,6 +5,7 @@ import { Schedule } from "@/types/tournamentData/schedule"
 import { Standings } from "@/types/tournamentData/standings"
 import { Scoring } from "@/types/tournamentInfo/scoring"
 import { doc, onSnapshot } from "firebase/firestore"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export default function StandingsTable({
@@ -15,6 +16,7 @@ export default function StandingsTable({
 	scoring: Scoring
 }) {
 	const [standings, setStandings] = useState<Standings | null>(null)
+	const router = useRouter()
 
 	useEffect(() => {
 		const docRef = doc(firestoreDB, "tournamentSchedule", tournamentId)
@@ -25,11 +27,12 @@ export default function StandingsTable({
 				const newStandings = updateStandings(schedule, scoring)
 				setStandings(await newStandings)
 			} else {
-				console.log("No such document!")
+				// console.log("No such document!")
+				router.push("/404")
 			}
 		})
 		return () => unsubscribe()
-	}, [scoring, tournamentId])
+	}, [router, scoring, tournamentId])
 
 	return (
 		<div className="flex w-full overflow-x-auto">

@@ -5,6 +5,7 @@ import { Schedule } from "@/types/tournamentData/schedule"
 import { Scoring } from "@/types/tournamentInfo/scoring"
 import { doc, onSnapshot } from "firebase/firestore"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function MatchesSchedule({
 	tournamentId,
@@ -16,6 +17,7 @@ export default function MatchesSchedule({
 	admin?: boolean
 }) {
 	const [schedule, setSchedule] = useState<Schedule | null>(null)
+	const router = useRouter()
 
 	useEffect(() => {
 		const docRef = doc(firestoreDB, "tournamentSchedule", tournamentId)
@@ -24,11 +26,12 @@ export default function MatchesSchedule({
 			if (docSnapshot.exists()) {
 				setSchedule(docSnapshot.data() as Schedule)
 			} else {
-				console.log("No such document!")
+				// console.log("No such document!")
+				router.push("/404")
 			}
 		})
 		return () => unsubscribe()
-	}, [tournamentId])
+	}, [router, tournamentId])
 
 	return (
 		<div className="container mx-auto">
@@ -46,20 +49,20 @@ export default function MatchesSchedule({
 									className={`menu-item ${
 										admin ? "" : "menu-item-disabled"
 									} flex flex-wrap justify-center`}>
-										{round.matches.map((match) => (
-											<MatchCard
-												key={
-													"round" +
-													round.roundNumber.toString() +
-													"-match" +
-													match.matchNumber.toString()
-												}
-												match={match}
-												tournamentId={tournamentId}
-												scoring={scoring}
-												roundNumber={round.roundNumber}
-											/>
-										))}
+									{round.matches.map((match) => (
+										<MatchCard
+											key={
+												"round" +
+												round.roundNumber.toString() +
+												"-match" +
+												match.matchNumber.toString()
+											}
+											match={match}
+											tournamentId={tournamentId}
+											scoring={scoring}
+											roundNumber={round.roundNumber}
+										/>
+									))}
 								</li>
 								<div className="divider my-0"></div>
 							</ul>

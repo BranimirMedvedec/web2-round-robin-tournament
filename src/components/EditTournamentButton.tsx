@@ -13,10 +13,8 @@ export default function EditTournamentButton({
 
 	const handleClick = () => {
 		setShowToast(true)
-		setTimeout(() => {
-			setShowToast(false)
-		}, 2000)
 		router.push("/tournament/" + params.url)
+		setShowToast(false)
 	}
 
 	return (

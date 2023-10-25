@@ -43,7 +43,7 @@ export default function TournamentListPage() {
 	}, [user?.sub])
 
 	if (isLoading) return <Loading />
-	if (error) return <div>{error.message}</div>
+	if (error) return <div>Error! Please try again.</div>
 	if (!user) router.push("/")
 
 	return (
@@ -55,7 +55,7 @@ export default function TournamentListPage() {
 							My Tournaments
 						</span>
 						<ul className="menu-items">
-							{tournaments &&
+							{tournaments.length > 0 ? (
 								tournaments.map((tournament, index) => (
 									<li key={index}>
 										<div className="divider"></div>
@@ -142,7 +142,19 @@ export default function TournamentListPage() {
 											</div>
 										</div>
 									</li>
-								))}
+								))
+							) : (
+								<li>
+									<p className="text-2xl font-bold mb-4">
+										You have not created any tournaments yet
+									</p>
+									<button
+										className="btn btn-primary"
+										onClick={() => router.push("/")}>
+										Home Page
+									</button>
+								</li>
+							)}
 						</ul>
 					</section>
 				</nav>
