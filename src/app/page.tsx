@@ -14,13 +14,13 @@ export default function Home() {
 		<div className="flex flex-col items-center justify-center min-h-screen">
 			<div className="container mx-auto py-8 text-center">
 				<div className="mb-8">
-					<h1 className="text-4xl font-bold mb-2">
+					<h1 className="text-4xl font-bold">
 						Web2: Round Robin Tournament
 					</h1>
-					<h2 className="text-xl mb-4">Welcome, {user.name}!</h2>
+					<h2 className="text-xl">Welcome, {user.name}!</h2>
 				</div>
-				<div className="flex flex-col justify-center items-center my-20">
-					<p className="text-gray-500 my-2 w-2/3">
+				<div className="flex flex-col justify-center items-center">
+					<p className="text-gray-500 w-2/3 mb-4">
 						To create a new tournament, click the button below. To
 						view and edit your existing tournaments, click the
 						avatar in the top right corner.
@@ -31,9 +31,11 @@ export default function Home() {
 		</div>
 	) : (
 		<div className="flex flex-col items-center justify-center h-screen text-center">
-			<h1 className="text-4xl font-bold mb-8">
-				Web2: Round Robin Tournament
-			</h1>
+			<div className="mb-8">
+				<h1 className="text-4xl font-bold">
+					Web2: Round Robin Tournament
+				</h1>
+			</div>
 
 			<div>
 				<h2 className="text-xl mb-4">
