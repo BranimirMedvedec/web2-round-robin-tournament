@@ -10,6 +10,7 @@ import RoundRobinTimetable from "@/lib/utils/roundRobinTimetable"
 import { Schedule } from "@/types/tournamentData/schedule"
 import CheckTournamentUrlExists from "@/lib/firestore/checkTournamentExists"
 import generateRandomString from "@/lib/utils/generateRandomString"
+import { Toast } from "./Toast"
 
 export default function TournamentModal() {
 	const router = useRouter()
@@ -21,11 +22,14 @@ export default function TournamentModal() {
 	const [loss, setLoss] = useState<number | null>(null)
 	const [disabled, setDisabled] = useState<boolean>(true)
 	const [invalidContestants, setInvalidContestants] = useState(false)
+	const [submitting, setSubmitting] = useState(false)
+
+	const [showToast, setShowToast] = useState(false)
 
 	const generateTournamentURL = () => {
 		return `${tournamentName
-  			.trimEnd()
-  			.replace(/\s+/g, "-")}-${generateRandomString(5)}`;
+			.trimEnd()
+			.replace(/\s+/g, "-")}-${generateRandomString(5)}`
 	}
 
 	useEffect(() => {
@@ -60,6 +64,9 @@ export default function TournamentModal() {
 		event: FormEvent<HTMLFormElement>
 	): Promise<void> {
 		event.preventDefault()
+		setSubmitting(true)
+
+		setShowToast(true)
 
 		if (!user) return
 
@@ -116,6 +123,10 @@ export default function TournamentModal() {
 			schedule
 		)
 
+        setShowToast(false)
+        
+
+
 		if (resultInfo && resultSchedule && resultStandings) {
 			router.push(`/tournament/${tournamentURL}`)
 		} else {
@@ -129,172 +140,196 @@ export default function TournamentModal() {
 		setWin(null)
 		setDraw(null)
 		setLoss(null)
+        setInvalidContestants(false)
+        setDisabled(true)
+        setSubmitting(false)
 	}
 
 	return (
-		<article>
-			<label
-				className="btn btn-primary"
-				htmlFor="modal-3">
-				Create New Tournament
-			</label>
-
-			<input
-				className="modal-state"
-				id="modal-3"
-				type="checkbox"
-				onClick={handleModalClose}
-			/>
-			<div className="modal">
-				<label className="modal-overlay"></label>
-				<div className="modal-content flex w-full flex-col gap-5 p-7">
-					<label
-						htmlFor="modal-3"
-						className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-						✕
-					</label>
-					<div className="flex flex-col gap-2">
-						<h2 className="text-center text-xl font-semibold">
-							Enter Tournament Details
-						</h2>
-					</div>
-
-					<form onSubmit={handleCreateTournament}>
-						<section>
-							<div className="form-group">
-								<div className="form-field">
-									<label className="form-label">
-										Tournament Name
-									</label>
-									<input
-										required
-										autoFocus
-										placeholder="Chess Tournament..."
-										type="text"
-										className="input max-w-full"
-										value={tournamentName}
-										onChange={(e) =>
-											setTournamentName(e.target.value)
-										}
-									/>
-								</div>
-
-								<div className="form-field">
-									<label
-										className={`form-label ${
-											invalidContestants
-												? "text-error"
-												: ""
-										}`}>
-										Contestants
-									</label>
-									<div className="form-control">
-										<textarea
+		<>
+			<article>
+				<label
+					className="btn btn-primary"
+					htmlFor="modal-3">
+					Create New Tournament
+				</label>
+				<input
+					className="modal-state"
+					id="modal-3"
+					type="checkbox"
+					onClick={handleModalClose}
+				/>
+				<div className="modal">
+					<label className="modal-overlay"></label>
+					<div className="modal-content flex w-full flex-col gap-5 p-7">
+						<label
+							htmlFor="modal-3"
+							className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+							✕
+						</label>
+						<div className="flex flex-col gap-2">
+							<h2 className="text-center text-xl font-semibold">
+								Enter Tournament Details
+							</h2>
+						</div>
+						<form onSubmit={handleCreateTournament}>
+							<section>
+								<div className="form-group">
+									<div className="form-field">
+										<label className="form-label">
+											Tournament Name
+										</label>
+										<input
 											required
-											className={`textarea max-w-full ${
-												invalidContestants
-													? "textarea-error"
-													: ""
-											}`}
-											rows={4}
-											placeholder="One contestant per line"
-											value={contestants.join("\n")}
-											onChange={(e) => {
-												const contestantsArray =
-													e.target.value.split("\n")
-												setContestants(contestantsArray)
-												handleInvalidContestantsCheck(
-													contestantsArray
+											autoFocus
+											placeholder="Chess Tournament..."
+											type="text"
+											className="input max-w-full"
+											value={tournamentName}
+											onChange={(e) =>
+												setTournamentName(
+													e.target.value
 												)
-											}}
+											}
 										/>
 									</div>
-									<label className="form-label">
-										<span
-											className={`form-label-alt ${
+									<div className="form-field">
+										<label
+											className={`form-label ${
 												invalidContestants
 													? "text-error"
 													: ""
 											}`}>
-											Enter 4 to 8 unique contestants with
-											no empty lines.
-										</span>
-									</label>
-								</div>
-
-								<div className="form-field">
-									<label className="form-label">
-										<span>Scoring (win/draw/loss)</span>
-									</label>
-									<div className="form-control justify-between">
-										<input
-											required
-											type="number"
-											step={0.5}
-											className="input w-1/3"
-											placeholder="Win"
-											value={win === 0 ? 0 : win || ""}
-											onChange={(e) =>
-												setWin(
-													e.target.value === "0"
-														? 0
-														: parseFloat(
-																e.target.value
-														  )
-												)
-											}
-										/>
-										<input
-											required
-											type="number"
-											step={0.5}
-											className="input w-1/3"
-											placeholder="Draw"
-											value={draw === 0 ? 0 : draw || ""}
-											onChange={(e) =>
-												setDraw(
-													e.target.value === "0"
-														? 0
-														: parseFloat(
-																e.target.value
-														  )
-												)
-											}
-										/>
-										<input
-											required
-											type="number"
-											step={0.5}
-											className="input w-1/3"
-											placeholder="Loss"
-											value={loss === 0 ? 0 : loss || ""}
-											onChange={(e) =>
-												setLoss(
-													e.target.value === "0"
-														? 0
-														: parseFloat(
-																e.target.value
-														  )
-												)
-											}
-										/>
+											Contestants
+										</label>
+										<div className="form-control">
+											<textarea
+												required
+												className={`textarea max-w-full ${
+													invalidContestants
+														? "textarea-error"
+														: ""
+												}`}
+												rows={4}
+												placeholder="One contestant per line"
+												value={contestants.join("\n")}
+												onChange={(e) => {
+													const contestantsArray =
+														e.target.value.split(
+															"\n"
+														)
+													setContestants(
+														contestantsArray
+													)
+													handleInvalidContestantsCheck(
+														contestantsArray
+													)
+												}}
+											/>
+										</div>
+										<label className="form-label">
+											<span
+												className={`form-label-alt ${
+													invalidContestants
+														? "text-error"
+														: ""
+												}`}>
+												Enter 4 to 8 unique contestants
+												with no empty lines.
+											</span>
+										</label>
+									</div>
+									<div className="form-field">
+										<label className="form-label">
+											<span>Scoring (win/draw/loss)</span>
+										</label>
+										<div className="form-control justify-between">
+											<input
+												required
+												type="number"
+												step={0.5}
+												className="input w-1/3"
+												placeholder="Win"
+												value={
+													win === 0 ? 0 : win || ""
+												}
+												onChange={(e) =>
+													setWin(
+														e.target.value === "0"
+															? 0
+															: parseFloat(
+																	e.target
+																		.value
+															  )
+													)
+												}
+											/>
+											<input
+												required
+												type="number"
+												step={0.5}
+												className="input w-1/3"
+												placeholder="Draw"
+												value={
+													draw === 0 ? 0 : draw || ""
+												}
+												onChange={(e) =>
+													setDraw(
+														e.target.value === "0"
+															? 0
+															: parseFloat(
+																	e.target
+																		.value
+															  )
+													)
+												}
+											/>
+											<input
+												required
+												type="number"
+												step={0.5}
+												className="input w-1/3"
+												placeholder="Loss"
+												value={
+													loss === 0 ? 0 : loss || ""
+												}
+												onChange={(e) =>
+													setLoss(
+														e.target.value === "0"
+															? 0
+															: parseFloat(
+																	e.target
+																		.value
+															  )
+													)
+												}
+											/>
+										</div>
+									</div>
+									<div className="form-field pt-5">
+										<div className="form-control justify-between">
+											<button
+												type="submit"
+												className="btn btn-primary w-full"
+												disabled={
+													disabled || submitting
+												}>
+												Create Tournament
+											</button>
+										</div>
 									</div>
 								</div>
-								<div className="form-field pt-5">
-									<div className="form-control justify-between">
-										<button
-											type="submit"
-											className="btn btn-primary w-full"
-											disabled={disabled}>
-											Create Tournament
-										</button>
-									</div>
-								</div>
-							</div>
-						</section>
-					</form>
+							</section>
+						</form>
+					</div>
 				</div>
-			</div>
-		</article>
+			</article>
+			{showToast && (
+				<Toast
+					type="warning"
+					message="Creating your tournament..."
+				/>
+			)}
+		</>
 	)
 }

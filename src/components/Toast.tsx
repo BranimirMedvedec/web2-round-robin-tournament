@@ -59,7 +59,7 @@ export function Toast({ type, message }: ToastProps) {
 				visible
 					? "opacity-100 translate-y-0"
 					: "opacity-0 -translate-y-2"
-			} transition-all duration-300
+			} transition-all duration-300 z-100
             ${
 				(icon[type] === icon["success"] &&
 					`bg-green-100 border-green-500`) ||

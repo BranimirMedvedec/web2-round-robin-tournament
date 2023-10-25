@@ -12,8 +12,8 @@ export default function Home() {
 
 	return user ? (
 		<div className="flex flex-col items-center justify-center min-h-screen">
-			<div className="container mx-auto py-8">
-				<div className="mb-8 text-center">
+			<div className="container mx-auto py-8 text-center">
+				<div className="mb-8">
 					<h1 className="text-4xl font-bold mb-2">
 						Web2: Round Robin Tournament
 					</h1>
@@ -30,12 +30,12 @@ export default function Home() {
 			</div>
 		</div>
 	) : (
-		<div className="flex flex-col items-center justify-center h-screen">
+		<div className="flex flex-col items-center justify-center h-screen text-center">
 			<h1 className="text-4xl font-bold mb-8">
 				Web2: Round Robin Tournament
 			</h1>
 
-			<div className="text-center">
+			<div>
 				<h2 className="text-xl mb-4">
 					To get started, create a new account or login!
 				</h2>
